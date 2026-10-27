@@ -1,6 +1,8 @@
 # Open-Source AI Pit of Success: Governance within the ACE (AI Statistical Environment)
 
-Code for the PHUSE 2026 paper. Slides: https://pub.current.posit.team/public/OpenSource_AI_Pit_of_Success/
+**Slides:** https://pub.current.posit.team/public/OpenSource_AI_Pit_of_Success/#/title-slide
+
+Code for the PHUSE 2026 paper.
 
 Data is the mock CDISC pilot study from {pharmaversesdtm} and {pharmaverseadam}.
 
