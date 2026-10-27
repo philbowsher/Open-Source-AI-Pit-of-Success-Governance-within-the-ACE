@@ -1,0 +1,53 @@
+name: adam
+description: >-
+  CDISCPILOT01 ADSL converted from SAS to R with admiral by Posit Assistant,
+  plus the pharmaverse reference ADSL for comparison. One record per subject;
+  screen failures excluded.
+tables:
+  - name: adsl
+    description: ADSL converted from programs/sas/adsl.sas (programs/r/adsl.R). Draft for programmer review.
+    columns:
+      - name: USUBJID
+        type: string(id)
+        description: Unique subject identifier.
+      - name: TRT01P
+        type: string
+        description: Planned treatment for period 01.
+        values: [Placebo, Xanomeline Low Dose, Xanomeline High Dose]
+      - name: AGE
+        type: number
+        description: Age in years.
+      - name: SEX
+        type: string
+        description: Sex.
+        values: ["F", "M"]
+      - name: AGEGR1
+        type: string
+        description: Pooled age group 1 (<65, 65-80, >80).
+      - name: ITTFL
+        type: string
+        description: Intent-to-treat population flag.
+        values: ["Y", "N"]
+      - name: SAFFL
+        type: string
+        description: Safety population flag.
+        values: ["Y", "N"]
+      - name: TRTSDT
+        type: date
+        description: Date of first exposure (SV visit 3 date, per define.xml).
+      - name: TRTEDT
+        type: date
+        description: Date of last exposure; discontinuation date used when missing.
+      - name: TRTDURD
+        type: number
+        description: Treatment duration in days.
+      - name: EOSSTT
+        type: string
+        description: End of study status.
+        values: [COMPLETED, DISCONTINUED]
+  - name: adsl_ref
+    description: Reference ADSL from the pharmaverseadam package.
+    columns:
+      - name: USUBJID
+        type: string(id)
+        description: Unique subject identifier.

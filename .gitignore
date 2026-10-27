@@ -1,0 +1,18 @@
+.posit/assistant/settings.json
+*.bak
+.venv/
+__pycache__/
+
+# Slide source material (never pushed)
+/paper/
+/slides/
+
+# Chat logs and deploy records (never pushed)
+.shinychat/
+rsconnect/
+rsconnect-python/
+
+# Generated outputs (re-render from the .qmd)
+reports/*.html
+reports/*.png
+reports/*_files/

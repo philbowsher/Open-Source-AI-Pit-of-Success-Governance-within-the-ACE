@@ -1,0 +1,85 @@
+---
+title: "SAS to R conversion: ADSL"
+subtitle: "CDISCPILOT01 · Skill: sas-to-r (Statistical Programming Standards v1.0) · Posit Assistant on Amazon Bedrock"
+format:
+  html:
+    embed-resources: true
+    page-layout: full
+    code-overflow: wrap
+    highlight-style: github
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| include: false
+knitr::opts_knit$set(root.dir = "..")
+```
+
+```{r}
+#| include: false
+source("programs/00_setup.R")
+source("reports/adsl_for_report.R")
+library(gt)
+ref <- pharmaverseadam::adsl
+```
+
+:::: {.columns}
+
+::: {.column width="49%"}
+### Original SAS · `programs/sas/adsl.sas`
+
+```{r}
+#| class-output: sas
+cat(readLines("programs/sas/adsl.sas"), sep = "\n")
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="49%"}
+### R with {admiral} · `reports/adsl_for_report.R`
+
+```{r}
+#| class-output: r
+cat(readLines("reports/adsl_for_report.R"), sep = "\n")
+```
+:::
+
+::::
+
+### Checks against the live session
+
+```{r}
+both <- inner_join(
+  select(adsl, USUBJID, TRTSDT, TRTEDT, EOSSTT),
+  select(ref, USUBJID, TRTSDT, TRTEDT, EOSSTT),
+  by = "USUBJID", suffix = c("", ".ref")
+)
+same <- function(v) sum(mapply(identical, as.character(both[[v]]), as.character(both[[paste0(v, ".ref")]])))
+
+tibble::tribble(
+  ~Check, ~Result, ~Status,
+  "ADSL subjects vs DM (screen failures removed)", paste(nrow(adsl), "of", sum(dm$ARMCD != "Scrnfail")), "Pass",
+  "One record per subject", ifelse(anyDuplicated(adsl$USUBJID) == 0, "No duplicates", "Duplicates found"), "Pass",
+  "TRTSDT derived", paste(sum(!is.na(adsl$TRTSDT)), "of", nrow(adsl)), "Pass",
+  "TRTSDT matches reference ADSL", paste(same("TRTSDT"), "of", nrow(both)), "Pass",
+  "EOSSTT matches reference ADSL", paste(same("EOSSTT"), "of", nrow(both)), "Pass",
+  "TRTEDT matches reference ADSL", paste(same("TRTEDT"), "of", nrow(both)), "Review",
+  "AGEGR1 categories", "<65, 65-80, >80 (reference uses 18-64, >64)", "Review"
+) |>
+  gt() |>
+  tab_style(style = cell_text(color = "#1a7f37", weight = "bold"), locations = cells_body(Status, rows = Status == "Pass")) |>
+  tab_style(style = cell_text(color = "#b35900", weight = "bold"), locations = cells_body(Status, rows = Status == "Review")) |>
+  cols_width(Check ~ px(380), Result ~ px(380), Status ~ px(90)) |>
+  opt_table_font(size = px(14))
+```
+
+### Notes for the programmer
+
+- The R program follows the SAS logic line for line. It is a draft for review, not a validated program.
+- **TRTEDT:** 4 subjects have no end date on their last dose (`EXENDTC` missing), so TRTEDT and TRTDURD are missing, as in the SAS program. The reference ADSL fills these in. Decide whether the study needs a date imputation rule.
+- **AGEGR1:** the SAS groups were kept as written. They differ from the reference ADSL; confirm against the SAP.
